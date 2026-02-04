@@ -1,11 +1,19 @@
 import { Request,Response, NextFunction } from "express";
 
 function autentication(req: Request, res: Response, next: NextFunction) {
-        const token = req.headers["authorization"];
+        let token = req.headers["authorization"];
 
-        if (!token || token.replace("Bearer ", "") !== process.env.APP_TOKEN_SECRET) {
-            return res.status(403).json({ error: "Token inválido ou ausente" });
+        if (!token) {
+            return res.status(403).json({ error: "Token not provided" });
         }
-        next();
+        token = token.replace("Bearer ", "");
+
+        if(token !== process.env.APP_TOKEN_SECRET) {
+            return res.status(403).json({ error: "Invalid Token" });
+        }
+
+        if(token === process.env.APP_TOKEN_SECRET) {
+            return next();
+        }
 }
 export default autentication;

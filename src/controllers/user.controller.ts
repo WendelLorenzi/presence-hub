@@ -1,17 +1,21 @@
 import { Request, Response } from "express";
-import UserService from "../services/user.service";
+import { UserService } from "../services";
 
 class UserController {
-    private readonly userService: UserService;
+    private userService: UserService;
     constructor() {
         this.userService = new UserService();
     }
     async createUser(req: Request, res: Response) {
         const { email, password } = req.body;
+        if(!email || !password) {
+            return res.status(400).json({ error: "Email and password are required" });
+        }
         try {
-            const user = await this.userService.registerUser(email, password);
-            res.status(200).json({user, token: process.env.APP_TOKEN_SECRET});
+            await this.userService.registerUser(email, password);
+            res.status(200).json({message: "User created successfully"});
         } catch (error) {
+            console.error('Error creating user:', error);
             res.status(400).json({ error });
         }
 
@@ -28,4 +32,4 @@ class UserController {
     }
 }
 
-export default UserController;
+export default new UserController();

@@ -1,11 +1,15 @@
 import app from "./app";
-import MongoDB from "./providers/mongoDB";
+import datawarehouse from "./datasource";
 
 const PORT = process.env.PORT || 3000;
-const db = new MongoDB(process.env.DATABASE_URI || "");
 
 (async () => {
-  await db.connect();
+    try {
+        await datawarehouse.connect();
+    } catch (error) {
+        console.error("Erro ao conectar ao banco de dados:", error);
+        await datawarehouse.disconnect();
+    }
 
   app.listen(PORT || 3000, () => console.log("🚀 Servidor rodando na porta 3000"));
 })();
